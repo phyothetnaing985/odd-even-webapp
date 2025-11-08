@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Odd or Even</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a1a; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 15px; }
+    .card { background: #1a1a2e; border-radius: 24px; padding: 30px; margin: 15px auto; max-width: 380px; box-shadow: 0 15px 35px rgba(0,0,0,0.6); }
+    .title { font-size: 28px; font-weight: bold; margin-bottom: 8px; }
+    .subtitle { font-size: 16px; opacity: 0.9; margin-bottom: 20px; }
+    .game-img { width: 100%; max-width: 280px; border-radius: 16px; margin: 20px auto; box-shadow: 0 8px 20px rgba(255,152,0,0.3); }
+    .play-btn { background: #ff9800; color: white; border: none; padding: 18px 50px; font-size: 20px; font-weight: bold; border-radius: 30px; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+    .play-btn:hover { background: #f57c00; transform: scale(1.05); }
+    .choice-btn { width: 48%; margin: 5px; padding: 16px; font-size: 18px; border-radius: 30px; font-weight: bold; }
+    .odd { background: #5865F2; }
+    .even { background: #ff9800; }
+    .bet-slider { width: 100%; height: 8px; border-radius: 5px; background: #333; margin: 20px 0; appearance: none; }
+    .bet-slider::-webkit-slider-thumb { appearance: none; width: 28px; height: 28px; background: #5865F2; border-radius: 50%; cursor: pointer; }
+    .confirm-btn { background: #5865F2; color: white; padding: 16px; border-radius: 30px; font-size: 18px; margin-top: 15px; width: 100%; }
+    .tab { display: flex; background: #333; border-radius: 30px; padding: 5px; margin: 20px 0; }
+    .tab button { flex: 1; background: none; border: none; color: #aaa; padding: 10px; font-size: 14px; border-radius: 25px; }
+    .tab button.active { background: #5865F2; color: white; }
+    .record-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #333; font-size: 14px; }
+    .win { color: #4CAF50; }
+    .lose { color: #f44336; }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="intro-card">
+    <h1 class="title">Odd or Even</h1>
+    <p class="subtitle">အနိုင်ရင် 1.96× (2% နုတ်)</p>
+    <img src="https://i.imgur.com/3kL9pQv.png" alt="Odd Even" class="game-img">
+    <button class="play-btn" onclick="startGame()">PLAY</button>
+  </div>
+
+  <div class="card" id="game-card" style="display:none;">
+    <h2>Bet on</h2>
+    <div>
+      <button class="choice-btn odd" onclick="select('Odd')">Odd</button>
+      <button class="choice-btn even" onclick="select('Even')">Even</button>
+    </div>
+
+    <div id="bet-section" style="display:none; margin-top:20px;">
+      <p>Bet on <strong id="choice-text"></strong></p>
+      <p><span id="bet-amount">0.1</span> TON</p>
+      <input type="range" min="0.1" max="1.0" step="0.1" value="0.1" class="bet-slider" id="bet-slider">
+      <button class="confirm-btn" onclick="confirmBet()">Confirm and Pay <span id="pay-amount">0.1</span> TON</button>
+    </div>
+
+    <div class="tab">
+      <button class="active" onclick="showTab('records')">Records</button>
+      <button onclick="showTab('won')">Won</button>
+      <button onclick="showTab('my')">My Tx</button>
+    </div>
+    <div id="records" class="records-content"></div>
+  </div>
+
+  <script>
+    let choice = '', bet = 0.1;
+
+    document.getElementById('bet-slider').oninput = (e) => {
+      bet = parseFloat(e.target.value);
+      document.getElementById('bet-amount').innerText = bet.toFixed(1);
+      document.getElementById('pay-amount').innerText = bet.toFixed(1);
+    };
+
+    function select(c) {
+      choice = c;
+      document.getElementById('choice-text').innerText = c;
+      document.getElementById('bet-section').style.display = 'block';
+    }
+
+    function confirmBet() {
+      const num = Math.floor(Math.random() * 100) + 1;
+      const isEven = num % 2 === 0;
+      const won = (choice === 'Even' && isEven) || (choice === 'Odd' && !isEven);
+      const payout = won ? (bet * 1.96).toFixed(3) : '0';
+
+      const result = won ? `<span class="win">+${payout} TON</span>` : `<span class="lose">0 TON</span>`;
+      addRecord('You', result, `${num} (${num % 10})`);
+
+      setTimeout(() => {
+        document.getElementById('bet-section').style.display = 'none';
+        choice = ''; bet = 0.1;
+        document.getElementById('bet-slider').value = 0.1;
+        document.getElementById('bet-amount').innerText = '0.1';
+        document.getElementById('pay-amount').innerText = '0.1';
+      }, 2000);
+    }
+
+    function addRecord(player, prize, hash) {
+      const row = `<div class="record-row">
+        <span>${player}</span>
+        <span>${prize}</span>
+        <span>${hash}</span>
+      </div>`;
+      document.getElementById('records').insertAdjacentHTML('afterbegin', row);
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function startGame() {
+      document.getElementById('intro-card').style.display = 'none';
+      document.getElementById('game-card').style.display = 'block';
+    }
+
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+  </script>
+</body>
+</html>
