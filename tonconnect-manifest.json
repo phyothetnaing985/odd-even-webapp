@@ -1,7 +1,7 @@
 {
   "url": "https://phyothenaing985.github.io/odd-even-webapp",
   "name": "TON Odd/Even Game",
-  "iconUrl": "https://ton.org/logo.png",
-  "termsOfUseUrl": "https://phyothenaing985.github.io/odd-even-webapp/terms",
-  "privacyPolicyUrl": "https://phyothenaing985.github.io/odd-even-webapp/privacy"
+  "iconUrl": "https://raw.githubusercontent.com/ton-community/tonconnect/main/tonconnect-logo.png",
+  "termsOfUseUrl": "https://phyothenaing985.github.io/odd-even-webapp",
+  "privacyPolicyUrl": "https://phyothenaing985.github.io/odd-even-webapp"
 }
